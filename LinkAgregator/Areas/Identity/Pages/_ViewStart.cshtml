@@ -1,3 +1,10 @@
 ﻿@{
     Layout = "/Views/Shared/_Layout.cshtml";
 }
+@if (User.Identity.IsAuthenticated)
+{
+    <h3>If your want to check or edit your links. Press button below!</h3>
+
+    <a href="@Url.Action("UserLinks","Links")" class="btn btn-info btn-lg ">My links</a>
+    <br /><hr />
+}

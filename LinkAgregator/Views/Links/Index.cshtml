@@ -1,0 +1,74 @@
+﻿@model IEnumerable<LinkAgregator.Data.Models.Link>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a asp-action="Create">Create New</a>
+    }
+    </p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Url)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rate)
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th></th>
+
+            <th></th>
+            }
+            </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                <a href="@Html.DisplayFor(modelItem => item.Url)">@Html.DisplayFor(modelItem => item.Url)</a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rate)
+            </td>
+            <td>
+                @if (!item.userId.ToString().Equals(@ViewData["userId"]) && User.Identity.IsAuthenticated)
+                {
+
+                    <a class="btn btn-xs btn-success" asp-action="AddVote" asp-route-id="@item.Id"><i class="fas fa-thumbs-up"></i></a>
+
+                }
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+                    @if (item.userId.ToString().Equals(@ViewData["userId"]))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-xs btn-warning">Edit  <i class="far fa-edit"></i></a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-xs btn-info">Details  <i class="fas fa-info"></i></a>
+                    @if (item.userId.ToString().Equals(@ViewData["userId"]))
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-xs btn-danger">Delete  <i class="fa fa-trash" aria-hidden="true"></i></a>
+                    }
+                </td>
+            }
+
+        </tr>
+}
+    </tbody>
+</table>
