@@ -30,6 +30,9 @@
 
             <th></th>
             }
+            <th>     
+              @Html.DisplayNameFor(model => model.Date)
+            </th>
             </tr>
     </thead>
     <tbody>
@@ -67,7 +70,9 @@
                     }
                 </td>
             }
-
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
         </tr>
 }
     </tbody>

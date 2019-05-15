@@ -14,6 +14,7 @@ namespace LinkAgregator.Data.Models
         public string Title { get; set; }
         public string Url { get; set; }
         public int Rate { get; set; }
+        public DateTime Date { get; set; }
         public Guid userId { get; set; }
     }
 }

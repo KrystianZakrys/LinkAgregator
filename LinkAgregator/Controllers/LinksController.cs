@@ -10,9 +10,8 @@ using LinkAgregator.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
+//TODO 3 = Zabezpieczenie linków 
 //TODO 4 = Komunikaty
-//TODO 3 = Zabezpieczenie linków żeby skryptów się nie dało dodać
-
 
 namespace LinkAgregator.Controllers
 {
@@ -33,7 +32,7 @@ namespace LinkAgregator.Controllers
             ViewBag.userId = GetUserIdString();
             ViewBag.MessageTitle = TempData["MessageTitle"];
             ViewBag.MessageText =  TempData["MessageText"];
-            return View(await _context.Links.ToListAsync());
+            return View(await _context.Links.OrderByDescending(x => x.Rate).Where(x => DateTime.Now.Subtract(x.Date).Days <= 5).ToListAsync());
         }
 
         // GET: MyLinks
@@ -72,6 +71,8 @@ namespace LinkAgregator.Controllers
         // GET: Links/Create
         public IActionResult Create()
         {
+            ViewBag.MessageTitle = TempData["MessageTitle"];
+            ViewBag.MessageText = TempData["MessageText"];
             return View();
         }
 
@@ -84,8 +85,15 @@ namespace LinkAgregator.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (!IsValidUri(link.Url))
+                {
+                    TempData["MessageTitle"] = "Failure";
+                    TempData["MessageText"] = "Invalid link format.";
+                    return RedirectToAction(nameof(Create));
+                }
                 link.Id = Guid.NewGuid();
                 link.userId = new Guid(_userManager.GetUserId(this.HttpContext.User));
+                link.Date = DateTime.Now;
                 _context.Add(link);
                 await _context.SaveChangesAsync();
                 TempData["MessageTitle"] = "Success";
@@ -117,7 +125,7 @@ namespace LinkAgregator.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,Url,Rate,userId")] Link link)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,Url,Rate,userId,Date")] Link link)
         {
             if (id != link.Id)
             {
@@ -196,11 +204,26 @@ namespace LinkAgregator.Controllers
         {
             return _context.Links.Any(e => e.Id == id);
         }
-
+        /// <summary>
+        /// Gets logged user Id
+        /// </summary>
+        /// <returns>logged user Id</returns>
         private string GetUserIdString()
         {
             var userId = String.IsNullOrEmpty(_userManager.GetUserId(this.HttpContext.User)) ? Guid.Empty : new Guid(_userManager.GetUserId(this.HttpContext.User));
             return userId.ToString();
+        }
+        /// <summary>
+        /// Validates url
+        /// </summary>
+        /// <param name="uri">url to add</param>
+        /// <returns>true if url is valid</returns>
+        public bool IsValidUri(string uri)
+        {
+            Uri uriResult;
+            bool result = Uri.TryCreate(uri, UriKind.Absolute, out uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            return result;
         }
     }
 }
