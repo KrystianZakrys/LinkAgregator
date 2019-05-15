@@ -17,6 +17,16 @@ namespace LinkAgregator.Controllers
 {
     public class LinksController : Controller
     {
+        #region constants
+        private const string MESSAGE_TITLE_SUCCESS = "Success";
+        private const string MESSAGE_TITLE_FAILURE = "Failure";
+        private const string MESSAGE_TEXT_VALIDATION_INVALID_LINK_FORMAT = "Invalid link format.";
+        private const string MESSAGE_TEXT_CREATE_LINK_SUCCESS = "Congratulation! Your link has been created.";
+        private const string MESSAGE_TEXT_UPDATE_LINK_SUCCESS = "Congratulation! Your link has been updated.";
+        private const string MESSAGE_TEXT_UPDATE_LINK_FAILURE = "Your link has not been updated.";
+        private const string MESSAGE_TEXT_DELETE_LINK_SUCCESS = "Congratulation! Your link has been deleted.";
+        #endregion
+
         private readonly ApplicationDbContext _context;
         private UserManager<IdentityUser> _userManager;
         
@@ -87,8 +97,8 @@ namespace LinkAgregator.Controllers
             {
                 if (!IsValidUri(link.Url))
                 {
-                    TempData["MessageTitle"] = "Failure";
-                    TempData["MessageText"] = "Invalid link format.";
+                    TempData["MessageTitle"] = MESSAGE_TITLE_FAILURE;
+                    TempData["MessageText"] = MESSAGE_TEXT_VALIDATION_INVALID_LINK_FORMAT;
                     return RedirectToAction(nameof(Create));
                 }
                 link.Id = Guid.NewGuid();
@@ -96,8 +106,8 @@ namespace LinkAgregator.Controllers
                 link.Date = DateTime.Now;
                 _context.Add(link);
                 await _context.SaveChangesAsync();
-                TempData["MessageTitle"] = "Success";
-                TempData["MessageText"] = "Congratulation! Your link has been created.";
+                TempData["MessageTitle"] = MESSAGE_TITLE_SUCCESS;
+                TempData["MessageText"] = MESSAGE_TEXT_CREATE_LINK_SUCCESS;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -150,12 +160,12 @@ namespace LinkAgregator.Controllers
                         throw;
                     }
                 }
-                TempData["MessageTitle"] = "Success";
-                TempData["MessageText"] = "Congratulation! Your link has been updated.";
+                TempData["MessageTitle"] = MESSAGE_TITLE_SUCCESS;
+                TempData["MessageText"] = MESSAGE_TEXT_UPDATE_LINK_SUCCESS;
                 return RedirectToAction(nameof(Index));
             }
-            TempData["MessageTitle"] = "Failure";
-            TempData["MessageText"] = "Your link has not been updated.";
+            TempData["MessageTitle"] = MESSAGE_TITLE_FAILURE;
+            TempData["MessageText"] = MESSAGE_TEXT_UPDATE_LINK_FAILURE;
            
             return View(link);
         }
@@ -186,8 +196,8 @@ namespace LinkAgregator.Controllers
             var link = await _context.Links.FindAsync(id);
             _context.Links.Remove(link);
             await _context.SaveChangesAsync();
-            TempData["MessageTitle"] = "Success";
-            TempData["MessageText"] = "Congratulation! Your link has been deleted.";
+            TempData["MessageTitle"] = MESSAGE_TITLE_SUCCESS;
+            TempData["MessageText"] = MESSAGE_TEXT_DELETE_LINK_SUCCESS;
             return RedirectToAction(nameof(Index));
         }
 
